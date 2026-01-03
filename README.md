@@ -18,11 +18,17 @@ prompts/
 
 ### Claude Commands
 
-Symlink commands to make them available as `/command` in Claude Code:
+Install commands to `~/.claude/commands/`:
 
 ```bash
-ln -sf $(pwd)/claude/commands/* ~/.claude/commands/
+./setup.sh
 ```
+
+The script will:
+
+- Copy new commands automatically
+- Skip commands that are already up to date
+- Ask before overwriting modified commands (with diff option)
 
 ### Formatting
 

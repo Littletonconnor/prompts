@@ -1,16 +1,36 @@
 ---
-allowed-tools: Bash(git add:*), Bash(git commit:*), Bash(git diff:*), Bash(git status:*)
+allowed-tools: Bash(git:*)
 description: Create a well-formatted conventional commit
+argument-hint: [branch-name]
 ---
+
+## Input
+
+**Target branch:** $ARGUMENTS
 
 ## Current State
 
+- Current branch: !`git branch --show-current`
 - Staged changes: !`git diff --cached --stat`
 - Unstaged changes: !`git status --short`
 
-## Task
+## Step 1: Branch (if specified)
 
-Create a conventional commit for the staged changes following these rules:
+If a target branch was provided above and it differs from current branch:
+
+```bash
+git switch <target-branch>
+# or if branch doesn't exist yet:
+git switch -c <target-branch>
+```
+
+If no target branch provided or already on that branch, skip this step.
+
+## Step 2: Stage (if needed)
+
+If nothing is staged but there are unstaged changes, suggest what to stage.
+
+## Step 3: Commit
 
 1. **Analyze** the staged diff to understand what changed
 2. **Determine** the commit type:
@@ -33,6 +53,8 @@ Create a conventional commit for the staged changes following these rules:
    - Explain WHAT and WHY, not HOW
    - Wrap at 72 characters
 
-5. **Execute** the commit with `git commit -m "..."`
+5. **Execute** the commit:
 
-If nothing is staged, suggest what to stage based on unstaged changes.
+```bash
+git commit -m "type(scope): description"
+```
