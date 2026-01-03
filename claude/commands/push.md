@@ -6,11 +6,12 @@ description: Push current branch to origin with a summary of changes
 ## Current State
 
 - Branch: !`git branch --show-current`
-- Commits ahead of master: !`git rev-list --count master..HEAD`
+- Default branch:
+  !`git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"`
 
-## Changes Since Master
+## Changes Since Default Branch
 
-!`git log master..HEAD --oneline`
+!`git log $(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")..HEAD --oneline 2>/dev/null || echo "No commits ahead or default branch not found"`
 
 ## Summary
 
