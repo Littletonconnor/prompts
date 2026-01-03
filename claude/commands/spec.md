@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Bash, SubAgents
+allowed-tools: Read, Write, Bash, SubAgents, Ask
 description: Interview, spec, plan, and execute a feature
 argument-hint: [feature-name or "archive" or "resume <spec-name>"]
 ---
@@ -44,7 +44,9 @@ Before starting, read last 3-5 specs from `specs/complete/` to understand projec
 
 ## Phase 1: Interview
 
-Interview me thoroughly about:
+**YOU MUST USE THE ASK TOOL** to interview me. Do not proceed without asking questions.
+
+Ask me one question at a time about:
 
 - Technical implementation details
 - UI/UX considerations
@@ -53,10 +55,12 @@ Interview me thoroughly about:
 
 **Rules:**
 
-- Ask non-obvious questions
+- Use the Ask tool for EVERY question - do not assume answers
+- Ask non-obvious questions that require my input
 - Go deep, don't accept surface-level answers
-- Continue until spec is truly complete
-- Write final spec to file when done
+- Wait for my response before asking the next question
+- Continue until spec is truly complete (usually 5-10 questions minimum)
+- Only write final spec to file after interview is complete
 
 **Scope creep:** If we identify out-of-scope ideas worth building:
 

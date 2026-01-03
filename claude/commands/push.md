@@ -30,4 +30,23 @@ description: Push current branch to origin with a summary of changes
    git push origin HEAD
    ```
 
+5. **Output PR-ready content** after successful push:
+
+   Generate a **title** from the branch name:
+   - Strip prefixes: `feature/`, `fix/`, `bugfix/`, `chore/`, `feat/`, `hotfix/`
+   - Replace `-` and `_` with spaces
+   - Title case the result
+   - Example: `feature/add-user-auth` → "Add User Auth"
+   - If branch name is generic (like `dev` or `wip`), use the first commit subject instead
+
+   Output in this format:
+   ```
+   ## PR Ready
+
+   **Title:** <generated title>
+
+   **Description:**
+   <the 2-3 sentence summary from step 3>
+   ```
+
 **Never force push.** If push fails due to remote changes, pull first.
