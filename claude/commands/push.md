@@ -6,21 +6,28 @@ description: Push current branch to origin with a summary of changes
 ## Current State
 
 - Branch: !`git branch --show-current`
-- Default branch:
-  !`git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"`
 
-## Changes Since Default Branch
+## Task
 
-!`git log $(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")..HEAD --oneline 2>/dev/null || echo "No commits ahead or default branch not found"`
+1. **Detect default branch** by running:
 
-## Summary
+   ```bash
+   git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+   ```
 
-Summarize the changes above in 2-3 sentences for a PR description.
+   If that fails, try `main`, then `master`.
 
-## Push
+2. **Show commits ahead** of default branch:
 
-```bash
-git push origin HEAD
-```
+   ```bash
+   git log <default-branch>..HEAD --oneline
+   ```
+
+3. **Summarize** the changes in 2-3 sentences (useful for PR description).
+
+4. **Push**:
+   ```bash
+   git push origin HEAD
+   ```
 
 **Never force push.** If push fails due to remote changes, pull first.
