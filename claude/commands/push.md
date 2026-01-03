@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git:*)
+allowed-tools: Bash
 description: Push current branch to origin with a summary of changes
 ---
 
