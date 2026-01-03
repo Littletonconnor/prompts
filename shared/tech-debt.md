@@ -1,0 +1,4 @@
+- Scan codebase for TODO/FIXME/HACK comments
+- Categorize by type (bug, enhancement, refactor)
+- Estimate effort and priority
+- Generate tickets/issues automatically

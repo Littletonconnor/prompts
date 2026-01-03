@@ -1,0 +1,13 @@
+{
+  "name": "prompts",
+  "version": "1.0.0",
+  "description": "Collection of AI prompts for Cursor and Claude",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}
