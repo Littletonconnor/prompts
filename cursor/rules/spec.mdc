@@ -1,0 +1,268 @@
+# Feature Specification Workflow
+
+Guide AI agents through a structured interview, specification, planning, and execution workflow for new features.
+
+## Critical Workflow Rule
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY WORKFLOW - DO NOT SKIP PHASES                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ 1. INTERVIEW  → Ask questions to understand requirements    │
+│ 2. SPEC       → Write complete specification                │
+│ 3. RESEARCH   → Analyze codebase and plan implementation    │
+│ 4. WAIT       → Get explicit approval before ANY changes    │
+│ 5. EXECUTE    → Implement autonomously after approval       │
+│                                                             │
+│ NEVER skip to step 5. ALWAYS interview first.               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Trigger Phrases
+
+- "New feature: [name]"
+- "Let's spec out [feature]"
+- "I want to build [feature]"
+- "Start spec for [feature]"
+- "Resume spec"
+- "Archive spec"
+
+## Directory Structure
+
+```sh
+project-root/
+├── spec.md                    # Active spec (priority if exists)
+└── specs/
+    ├── todo/                  # Queue (lowest number = next)
+    │   ├── spec_01.md
+    │   └── spec_dashboard.md  # Parked (status: in-progress)
+    └── complete/              # Archived specs
+```
+
+## Autonomy Rules
+
+**Do without asking:** Read files, search code, write/modify files in current directory
+
+**Ask before:** Modifying files outside current directory, deleting anything
+
+Don't ask "would you like me to..." - just do it if in scope.
+
+---
+
+## Finding Active Spec
+
+1. If `spec.md` exists at root → use it
+2. Else find lowest-numbered `specs/todo/spec_*.md` (skip `status: in-progress`)
+3. If none found → offer to create one
+
+## Context Loading
+
+Before starting, read last 3-5 specs from `specs/complete/` to understand project patterns.
+
+---
+
+## Phase 1: Interview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ⚠️  MANDATORY: Ask questions before writing any spec         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ Do NOT assume answers. Do NOT proceed without asking.       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Ask one question at a time about:
+
+- Technical implementation details
+- UI/UX considerations
+- Concerns and tradeoffs
+- Edge cases
+
+**Rules:**
+
+- Ask non-obvious questions that require user input
+- Go deep, don't accept surface-level answers
+- Wait for response before asking the next question
+- Continue until spec is truly complete (usually 5-10 questions minimum)
+- Only write final spec to file after interview is complete
+
+**Scope creep:** If you identify out-of-scope ideas worth building:
+
+1. Create `specs/todo/spec_{name}.md` with `status: in-progress` header
+2. Jot notes there
+3. Continue current interview
+
+---
+
+## Phase 2: Research & Plan
+
+Once spec is written:
+
+1. Research codebase - trace code paths, understand patterns
+2. Present implementation plan:
+   - Files to create/modify
+   - Order of operations
+   - Key implementation details
+   - Risks and edge cases
+3. Wait for approval
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ⏸️  AWAITING APPROVAL                                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ Please review the plan above and respond with:              │
+│                                                             │
+│ • "go" / "approved" / "do it" - Execute the plan            │
+│ • "changes: [details]" - Request modifications              │
+│ • "stop" - Do not proceed                                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Phase 3: Execute
+
+When approved ("go", "approved", "do it"):
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🚀 FULLY AUTONOMOUS MODE - NO PROMPTING                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ • Do NOT ask for confirmation                               │
+│ • Do NOT pause between steps                                │
+│ • Do NOT summarize and wait                                 │
+│ • Just execute continuously until done                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+1. **Parallelize** - Determine which tasks can run simultaneously
+2. **Execute** - Work through implementation systematically
+3. **Report** - Single summary when ALL work is complete
+
+Plan approval = approval for all edits.
+
+---
+
+## Archive Command
+
+When user says "archive" or "complete":
+
+1. Determine next number from `specs/complete/`
+2. Add header:
+
+```yaml
+---
+spec: XX
+date: YYYY-MM-DD
+builds_on: [spec_01, spec_03] # if applicable
+summary: |
+  2-3 sentence summary
+key_decisions:
+  - Decision 1
+  - Decision 2
+---
+```
+
+3. Move to `specs/complete/spec_XX.md`
+4. Renumber remaining `specs/todo/` starting at 01
+
+---
+
+## Resume Command
+
+When user says "resume [spec-name]":
+
+1. Read notes from parked spec
+2. Remove `status: in-progress`, assign next number
+3. Start fresh Phase 1 interview, using notes as context
+
+---
+
+## Interview Question Examples
+
+Good questions to ask during Phase 1:
+
+### Technical
+- "How should this interact with [existing feature]?"
+- "Should this be a separate component or extend [existing component]?"
+- "What data persistence is needed? Local state, database, or both?"
+
+### UI/UX
+- "What should happen when [edge case]?"
+- "Should there be loading/error states? What should they show?"
+- "Is this mobile-responsive? Any specific mobile considerations?"
+
+### Tradeoffs
+- "This could be done with [A] or [B]. [A] is simpler but [B] is more flexible. Preference?"
+- "Do you want this optimized for [speed/maintainability/flexibility]?"
+
+### Scope
+- "Should we handle [related thing] now or leave for later?"
+- "Is [feature extension] in scope or should I note it for a future spec?"
+
+---
+
+## Spec File Template
+
+```markdown
+# [Feature Name]
+
+## Overview
+[2-3 sentence summary of what we're building]
+
+## Requirements
+- [ ] Requirement 1
+- [ ] Requirement 2
+
+## Technical Details
+[Key implementation decisions from interview]
+
+## UI/UX
+[User experience decisions]
+
+## Edge Cases
+- Case 1: [handling]
+- Case 2: [handling]
+
+## Out of Scope
+- [Thing we're not doing now]
+
+## Open Questions
+- [Any remaining uncertainties]
+```
+
+---
+
+## Safety Rules
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ NEVER                                                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ • Skip the interview phase                                  │
+│ • Assume requirements without asking                        │
+│ • Start coding before plan approval                         │
+│ • Delete files without explicit permission                  │
+│ • Modify files outside scope without asking                 │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│ ALWAYS                                                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ • Ask 5-10 questions minimum before writing spec            │
+│ • Write spec to file before planning                        │
+│ • Present plan and wait for approval                        │
+│ • Run tests after implementation                            │
+│ • Provide single completion summary                         │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```

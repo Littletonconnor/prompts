@@ -1,11 +1,14 @@
 # Prompts
 
-A collection of prompts, rules, and commands for AI-assisted development.
+A collection of prompts, rules, commands, and skills for AI-assisted development.
 
 ## Structure
 
 ```
 prompts/
+├── skills/             # Agent skills (for Claude and Cursor)
+│   ├── react-best-practices/
+│   └── web-design-guidelines/
 ├── cursor/
 │   └── rules/          # Cursor rules (.cursorrules content)
 ├── claude/
@@ -16,9 +19,7 @@ prompts/
 
 ## Setup
 
-### Claude Commands
-
-Install commands to `~/.claude/commands/`:
+Run the setup script to install commands and skills:
 
 ```bash
 ./setup.sh
@@ -26,9 +27,10 @@ Install commands to `~/.claude/commands/`:
 
 The script will:
 
-- Copy new commands automatically
-- Skip commands that are already up to date
-- Ask before overwriting modified commands (with diff option)
+- Install Claude commands to `~/.claude/commands/`
+- Install skills to `~/.claude/skills/` and `~/.cursor/skills/`
+- Skip items that are already up to date
+- Ask before overwriting modified items (with diff option)
 
 ### Formatting
 
@@ -39,6 +41,16 @@ npm run format:check # Check formatting
 ```
 
 ## Usage
+
+### Skills
+
+Skills are automatically discovered by Claude Code and Cursor from their respective skills directories.
+After running `setup.sh`, skills will be available in both tools.
+
+**Available skills:**
+
+- **react-best-practices** - React/Next.js performance optimization (49 rules across 8 categories)
+- **web-design-guidelines** - UI/accessibility/UX best practices (100+ rules, fetched dynamically)
 
 ### Claude Commands
 

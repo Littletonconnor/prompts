@@ -120,3 +120,4 @@ If yes, generate tests following the project's existing patterns.
 - Don't suggest tests for trivial code (simple assignments, logging)
 - Focus on behavioral coverage, not line coverage
 - Identify flaky test risks (time-dependent, order-dependent)
+
