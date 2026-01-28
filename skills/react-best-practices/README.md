@@ -1,6 +1,7 @@
 # React Best Practices
 
-A structured repository for creating and maintaining React Best Practices optimized for agents and LLMs.
+A structured repository for creating and maintaining React Best Practices optimized for agents and
+LLMs.
 
 ## Structure
 
@@ -10,22 +11,25 @@ A structured repository for creating and maintaining React Best Practices optimi
   - `area-description.md` - Individual rule files
 - `src/` - Build scripts and utilities
 - `metadata.json` - Document metadata (version, organization, abstract)
-- __`AGENTS.md`__ - Compiled output (generated)
-- __`test-cases.json`__ - Test cases for LLM evaluation (generated)
+- **`AGENTS.md`** - Compiled output (generated)
+- **`test-cases.json`** - Test cases for LLM evaluation (generated)
 
 ## Getting Started
 
 1. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 2. Build AGENTS.md from rules:
+
    ```bash
    pnpm build
    ```
 
 3. Validate rule files:
+
    ```bash
    pnpm validate
    ```
@@ -55,7 +59,7 @@ A structured repository for creating and maintaining React Best Practices optimi
 
 Each rule file should follow this structure:
 
-```markdown
+````markdown
 ---
 title: Rule Title Here
 impact: MEDIUM
@@ -72,6 +76,7 @@ Brief explanation of the rule and why it matters.
 ```typescript
 // Bad code example
 ```
+````
 
 **Correct (description of what's right):**
 
@@ -106,18 +111,3 @@ Reference: [Link](https://example.com)
 - `pnpm validate` - Validate all rule files
 - `pnpm extract-tests` - Extract test cases for LLM evaluation
 - `pnpm dev` - Build and validate
-
-## Contributing
-
-When adding or modifying rules:
-
-1. Use the correct filename prefix for your section
-2. Follow the `_template.md` structure
-3. Include clear bad/good examples with explanations
-4. Add appropriate tags
-5. Run `pnpm build` to regenerate AGENTS.md and test-cases.json
-6. Rules are automatically sorted by title - no need to manage numbers!
-
-## Acknowledgments
-
-Originally created by [@shuding](https://x.com/shuding) at [Vercel](https://vercel.com).
