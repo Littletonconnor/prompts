@@ -1,0 +1,349 @@
+---
+description:
+  Sprint planner workflow — refine Jira tickets into actionable plans and execute them, with
+  parallel agent support
+globs: docs/active/**/*.md,docs/completed/**/*.md
+alwaysApply: false
+---
+
+# Sprint Planner Workflow
+
+Guide AI agents through structured ticket refinement, codebase research, planning, and parallel
+execution for sprint work.
+
+## Critical Workflow Rule
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ MANDATORY WORKFLOW - DO NOT SKIP PHASES                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ 1. TRIAGE    → Read ticket, ask refinement questions        │
+│ 2. RESEARCH  → Explore codebase, document findings          │
+│ 3. PLAN      → Write step-by-step implementation plan       │
+│ 4. APPROVE   → Present plan, wait for explicit approval     │
+│ 5. EXECUTE   → Implement (parallel agents if applicable)    │
+│ 6. COMPLETE  → Move ticket to completed/                    │
+│                                                             │
+│ NEVER skip to step 5. ALWAYS triage and research first.     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Trigger Phrases
+
+- "Refine this ticket"
+- "Plan this ticket"
+- "Let's work on [JIRA-ID]"
+- "Research [JIRA-ID]"
+- "Execute [JIRA-ID]"
+- "Run tickets in parallel"
+- "What's ready to execute?"
+
+## Context: Workspace Repos
+
+This code-workspace contains 9 repos. Know which ones a ticket touches before planning:
+
+| Label                                   | Repo                              | Type     |
+| --------------------------------------- | --------------------------------- | -------- |
+| FRONTEND — taos                         | ../taos                           | Frontend |
+| FRONTEND — santafe                      | ../santafe                        | Frontend |
+| BACKEND — wealthfront-platform          | ../wealthfront-platform           | Backend  |
+| BACKEND — wealthfront-backend           | ../wealthfront-backend            | Backend  |
+| BACKEND — wealthfront-banking           | ../wealthfront-banking            | Backend  |
+| BACKEND — wealthfront-models            | ../wealthfront-models             | Backend  |
+| BACKEND — wealthfront-api               | ../wealthfront-api                | Backend  |
+| DEVOPS — wf_frontend                    | ../wf_frontend                    | DevOps   |
+| DEVOPS — fastly-terraform-configuration | ../fastly-terraform-configuration | DevOps   |
+
+---
+
+## Phase 1: Triage
+
+When a ticket has `Status: draft`:
+
+1. Read the entire ticket file
+2. Read Section 1 (Raw Ticket / Context) carefully
+3. Ask refinement questions — **one at a time, minimum 5**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ MANDATORY: Ask questions before writing any plan            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ Do NOT assume answers. Do NOT proceed without asking.       │
+│ Wait for the user's response before asking the next one.    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Question Categories
+
+**Scope & Requirements**
+
+- "The Jira description mentions X — does that include Y, or is Y out of scope?"
+- "What's the acceptance criteria? How do we know this is done?"
+- "Should this be behind a feature flag?"
+
+**Repos & Architecture**
+
+- "Which repos does this touch? Just taos, or does the backend need changes too?"
+- "Is there an existing pattern for this, or are we building something new?"
+- "Does this need API changes? New endpoints, modified responses?"
+
+**Dependencies & Ordering**
+
+- "Does this depend on any other tickets landing first?"
+- "Are other tickets waiting on this one?"
+- "Any external blockers — design, API contracts, etc.?"
+
+**Edge Cases**
+
+- "What should happen when [edge case]?"
+- "How does this interact with [existing feature]?"
+- "Any backward compatibility concerns?"
+
+**Rules:**
+
+- Update ticket status to `refining` after first question
+- Log each answered question in Section 2 (check it off, add the answer)
+- Go deep — don't accept vague answers
+- If you spot scope creep, call it out and ask if it belongs in a separate ticket
+
+---
+
+## Phase 2: Research
+
+Once questions are answered:
+
+1. Identify which workspace repos are relevant from the ticket's **Repos** field
+2. Explore those repos — search for related files, patterns, APIs
+3. Write findings into **Section 3 — Research & Findings**
+
+### 2a. Code Research
+
+Fill in **Section 3a — Relevant Code**:
+
+- Files, functions, components, endpoints, data models this ticket touches
+- Include short code snippets showing the **current state** of code that will change
+- Trace the call path — where does data flow from/to?
+
+### 2b. Pattern Research
+
+Fill in **Section 3b — Existing Patterns**:
+
+- How does the codebase already solve similar problems?
+- What conventions, abstractions, or utilities should this ticket reuse?
+
+### 2c. Test Research
+
+Fill in **Section 3c — Test Coverage**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ MANDATORY: Audit existing tests before planning             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ For every file this ticket will modify:                     │
+│                                                             │
+│ 1. Find its test file (co-located or in __tests__/)        │
+│ 2. Read the test file — what cases does it cover?           │
+│ 3. Identify gaps — what's NOT tested that should be?        │
+│ 4. Determine if existing tests will break after changes     │
+│ 5. List new test cases needed for the new behavior          │
+│                                                             │
+│ If no tests exist for a file, flag it explicitly.           │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Record in Section 3c:
+- **Existing test files**: paths to test files for affected code
+- **What's covered**: summary of existing test cases
+- **What's missing / needs updating**: tests that will break or have gaps
+- **New tests needed**: test cases for the new behavior
+
+### 2d. Update Ticket Header
+
+- Fill in **Touches files** with key file paths (source + test files)
+- Fill in **Parallel safe** based on overlap analysis with other active tickets
+
+---
+
+## Phase 3: Plan
+
+Build the implementation plan in **Section 4**:
+
+### 3a. Background (Section 4.0)
+
+Write **Section 4.0 — Background & Motivation**:
+- Why are we building this? What problem does it solve?
+- What's the user-facing or system-level impact?
+- Enough context that someone unfamiliar with the ticket could understand it
+
+### 3b. Implementation Steps (Section 4.1+)
+
+Break work into steps — each step = one commit or small PR:
+
+1. For each step, specify:
+   - **Files**: exact paths to create/modify
+   - **What**: concrete description of the change
+   - **Why**: rationale linking back to the requirement
+2. Order steps by dependency (what must land first)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ MANDATORY: Include code snippets in every step              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ Each step MUST include code showing the change:             │
+│                                                             │
+│ • Before/after diffs for modifications                      │
+│ • Full code blocks for new files or functions               │
+│ • Pseudocode when the exact syntax depends on research      │
+│                                                             │
+│ The plan should be concrete enough that an agent can        │
+│ execute it without guessing what the code should look like. │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3c. Test Step
+
+Every plan MUST include a dedicated test step (Section 4.X) that:
+- Updates existing tests that will break from the changes
+- Adds new test cases for new behavior (identified in Section 3c)
+- Includes example test code snippets
+
+### 3d. Remaining Sections
+
+- Fill in **Section 5 — Edge Cases & Risks**
+- Fill in **Section 6 — Testing Strategy** (unit, integration, manual QA)
+- Create matching checkboxes in **Section 7 — Execution Log**
+
+Update ticket status to `ready`.
+
+---
+
+## Phase 4: Approve
+
+Present the plan and wait:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ AWAITING APPROVAL                                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ Please review the plan above and respond with:              │
+│                                                             │
+│ • "go" / "approved" / "do it" — Execute the plan           │
+│ • "changes: [details]" — Request modifications              │
+│ • "stop" — Do not proceed                                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+If changes requested → revise plan → present again.
+
+---
+
+## Phase 5: Execute
+
+When approved:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ FULLY AUTONOMOUS MODE - NO PROMPTING                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ • Do NOT ask for confirmation between steps                 │
+│ • Do NOT pause to summarize                                 │
+│ • Execute continuously until done                           │
+│ • Check off items in Section 7 as you go                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+1. Update ticket status to `in-progress`
+2. Work through Section 4 step by step
+3. After each step, check off the corresponding item in Section 7
+4. When all steps complete, provide a single summary
+
+### Parallel Execution
+
+If the user asks to run multiple tickets in parallel:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ PARALLEL SAFETY CHECKS — MUST PASS BEFORE LAUNCHING         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ For each pair of tickets being parallelized:                │
+│                                                             │
+│ 1. Both must have Status: ready                             │
+│ 2. Touches files must not overlap                           │
+│ 3. Neither can appear in the other's Depends on             │
+│ 4. Neither can be Blocked by the other                      │
+│                                                             │
+│ If ANY check fails → tell the user which tickets conflict   │
+│ and suggest an execution order instead.                     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+When launching parallel agents:
+
+- Each agent receives the full ticket markdown as its task description
+- Include the relevant repo paths so the agent knows where to work
+- Each agent updates its own ticket's Execution Log
+- Limit to 3 concurrent agents maximum
+
+---
+
+## Phase 6: Complete
+
+When execution is finished:
+
+1. Update ticket status to `completed`
+2. Move the file: `docs/active/sprint-XX/JIRA-ID.md` → `docs/completed/sprint-XX/JIRA-ID.md`
+3. Create the `completed/sprint-XX/` directory if it doesn't exist
+
+---
+
+## Autonomy Rules
+
+**Do without asking:** Read files, search code, write to the ticket markdown, explore any workspace
+repo
+
+**Ask before:** Modifying source code (only after plan approval), deleting files, changes outside
+the ticket's listed repos
+
+Don't ask "would you like me to..." — just do it if it's within scope.
+
+---
+
+## Safety Rules
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ NEVER                                                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ • Skip the triage phase                                     │
+│ • Assume requirements without asking                        │
+│ • Start coding before plan approval                         │
+│ • Run parallel agents on tickets that share files           │
+│ • Modify repos not listed in the ticket's Repos field       │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│ ALWAYS                                                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ • Ask 5+ questions before writing a plan                    │
+│ • Research the codebase before planning                     │
+│ • Present the plan and wait for approval                    │
+│ • Check parallel safety before launching agents             │
+│ • Update the ticket markdown as you go                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
